@@ -2,6 +2,7 @@
 
 
 add_subdirectory(glfw)
+add_subdirectory(nativefiledialog-extended)
 
 
 add_library(dependencies STATIC
@@ -18,7 +19,9 @@ add_library(dependencies STATIC
 )
 
 target_link_libraries(dependencies PUBLIC
-        glfw)
+        glfw
+        nfd
+)
 
 target_include_directories(dependencies PUBLIC
         glad/include

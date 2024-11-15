@@ -4,18 +4,48 @@
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <nfd.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+static nfdu8filteritem_t image_filters[1] = {{"Images code", "png,jpg,jpeg"}};
+static nfdopendialogu8args_t image_open_args = {image_filters, 1};
 
 static void glfw_error_callback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
+static std::string get_file_dialogue() {
+	nfdu8char_t *outPath;
+	nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &image_open_args);
+
+	if (result == NFD_OKAY) {
+
+		std::string stringPath = std::string(outPath);
+		NFD_FreePathU8(outPath);
+		return stringPath;
+	}
+
+	std::cerr << "Failed to get file from dialogue" << std::endl;
+	return "";
+}
+
+static void load_image(const std::string& path) {
+	
+}
+
+static void load_image_from_dialogue() {
+	const std::string image_path = get_file_dialogue(); 
+	if (!image_path.empty()) {
+		load_image(image_path);
+	};
+}
 
 int main() {
+
+	
 	glfwSetErrorCallback(glfw_error_callback);
 	constexpr ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -36,6 +66,17 @@ int main() {
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
+	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
+			return;
+		}
+
+		if (key == GLFW_KEY_O && mods & (GLFW_MOD_CONTROL) && action == GLFW_PRESS) {
+			load_image_from_dialogue();	
+		}
+	});
+
 	// Setup Dear ImGui context
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
@@ -52,6 +93,9 @@ int main() {
 	int display_w, display_h;
 
 	bool showDemo = true;
+
+	NFD_Init();
+	
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -73,8 +117,19 @@ int main() {
 		glViewport(0, 0, display_w, display_h);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+		
+		if (ImGui::BeginMainMenuBar()) {
+			if (ImGui::BeginMenu("File")) {
+				if (ImGui::MenuItem("Open", "Ctrl+O")) {
 
-		ImGui::ShowDemoWindow(&showDemo);
+					load_image_from_dialogue();
+				}
+				if (ImGui::MenuItem("Save", "Ctrl+S")) {
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMainMenuBar();
+		}
 		ImGui::Render();
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -90,6 +145,8 @@ int main() {
 		glfwSwapBuffers(window);
 	}
 
+	NFD_Quit();
+
 	// Cleanup
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -97,6 +154,7 @@ int main() {
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
 
 	return 0;
 }

@@ -5,3 +5,6 @@
 [submodule "ext/glfw"]
 	path = ext/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "ext/nativefiledialog-extended"]
+	path = ext/nativefiledialog-extended
+	url = https://github.com/btzy/nativefiledialog-extended.git
