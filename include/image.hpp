@@ -23,7 +23,7 @@ static nfdopendialogu8args_t image_open_args = {image_filters, 1};
 
 static std::string get_file_dialogue() {
 	nfdu8char_t* outPath;
-	nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &image_open_args);
+	const nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &image_open_args);
 
 	if (result == NFD_OKAY) {
 		std::string stringPath = std::string(outPath);
@@ -36,7 +36,7 @@ static std::string get_file_dialogue() {
 }
 
 static bool load_image(const std::string& path, image* image) {
-	auto extension = std::filesystem::path(path).extension();
+	const std::filesystem::path extension = std::filesystem::path(path).extension();
 
 	if (extension == ".jpg" || extension == ".jpeg") {
 		image->data = stbi_load(path.c_str(), &image->width, &image->height, &image->channels, 3);

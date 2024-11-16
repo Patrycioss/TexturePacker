@@ -1,6 +1,5 @@
 ﻿#include <iostream>
 
-#include "image_loading.hpp"
 #include "display_image.hpp"
 
 #include <imgui.h>
@@ -13,22 +12,21 @@
 
 static std::vector<display_image> display_images;
 
-static void glfw_error_callback(int error, const char* description) {
+static void glfw_error_callback(const int error, const char* description) {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
 static void trigger_image_load_dialogue() {
-	image image;
+	image image{};
 	if (load_image_from_dialogue(&image)) {
 		display_image& display_image = display_images.emplace_back();
 		create_display_image(&display_image, image);
-	}
-	else {
+	} else {
 		std::cerr << "Failed to load image" << std::endl;
 	}
 }
 
-static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+static void glfw_key_callback(GLFWwindow* window, const int key, const int scancode, const int action, const int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 		return;
@@ -40,7 +38,7 @@ static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int act
 	}
 
 	if (key == GLFW_KEY_DELETE && action == GLFW_PRESS) {
-		if (display_images.size() > 0) {
+		if (!display_images.empty()) {
 			display_images.pop_back();
 		}
 		return;
@@ -58,7 +56,7 @@ int main() {
 		return -1;
 	}
 
-	GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World!", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(640, 480, "Texture Packer", nullptr, nullptr);
 	if (!window) {
 		std::cerr << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -75,7 +73,7 @@ int main() {
 	ImGuiIO& io = ImGui::GetIO();
 	(void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Game pad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
 
@@ -83,8 +81,6 @@ int main() {
 	ImGui_ImplOpenGL3_Init("#version 130");
 
 	int display_w, display_h;
-
-	bool showDemo = true;
 
 	NFD_Init();
 

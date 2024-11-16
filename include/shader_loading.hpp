@@ -2,7 +2,7 @@
 
 enum shader_type { VERTEX_SHADER = GL_VERTEX_SHADER, FRAGMENT_SHADER = GL_FRAGMENT_SHADER };
 
-inline bool check_shader_compilation(uint32_t shader, const std::string& name) {
+inline bool check_shader_compilation(const uint32_t shader, const std::string& name) {
 	int success;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
@@ -16,7 +16,7 @@ inline bool check_shader_compilation(uint32_t shader, const std::string& name) {
 	return true;
 }
 
-inline bool check_program_compilation(uint32_t program, const std::string& name) {
+inline bool check_program_compilation(const uint32_t program, const std::string& name) {
 	int success;
 	glGetProgramiv(program, GL_LINK_STATUS, &success);
 
@@ -44,14 +44,14 @@ inline bool read_file_to_string(const std::string& path, std::string* output) {
 	return true;
 }
 
-inline bool load_shader(int* shader, shader_type type, const std::string& path, const std::string& name) {
+inline bool load_shader(int* shader, const shader_type type, const std::string& path, const std::string& name) {
 	std::string source;
 
 	if (read_file_to_string(path, &source)) {
 		*shader = glCreateShader(type);
-		const char* source_cstr = source.c_str();
+		const char* src_str = source.c_str();
 
-		glShaderSource(*shader, 1, &source_cstr, nullptr);
+		glShaderSource(*shader, 1, &src_str, nullptr);
 		glCompileShader(*shader);
 
 		if (!check_shader_compilation(*shader, name)) {
@@ -65,7 +65,7 @@ inline bool load_shader(int* shader, shader_type type, const std::string& path, 
 	return false;
 }
 
-inline bool create_shader_program(uint32_t* program, int shaders[], int shader_count, const std::string& name) {
+inline bool create_shader_program(uint32_t* program, int shaders[], const int shader_count, const std::string& name) {
 	*program = glCreateProgram();
 
 	for (int i = 0; i < shader_count; i++) {
