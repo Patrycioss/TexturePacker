@@ -8,3 +8,6 @@
 [submodule "ext/nativefiledialog-extended"]
 	path = ext/nativefiledialog-extended
 	url = https://github.com/btzy/nativefiledialog-extended.git
+[submodule "ext/stb"]
+	path = ext/stb
+	url = https://github.com/nothings/stb.git

@@ -1,51 +1,55 @@
 ﻿#include <iostream>
 
-#include <glad/glad.h>
+#include "image_loading.hpp"
+#include "display_image.hpp"
+
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-#include <nfd.h>
 
 #define GLFW_INCLUDE_NONE
+#include <vector>
 #include <GLFW/glfw3.h>
 
-static nfdu8filteritem_t image_filters[1] = {{"Images code", "png,jpg,jpeg"}};
-static nfdopendialogu8args_t image_open_args = {image_filters, 1};
+static std::vector<display_image> display_images;
 
-static void glfw_error_callback(int error, const char* description)
-{
+static void glfw_error_callback(int error, const char* description) {
 	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-static std::string get_file_dialogue() {
-	nfdu8char_t *outPath;
-	nfdresult_t result = NFD_OpenDialogU8_With(&outPath, &image_open_args);
+static void trigger_image_load_dialogue() {
+	image image;
+	if (load_image_from_dialogue(&image)) {
+		display_image& display_image = display_images.emplace_back();
+		create_display_image(&display_image, image);
+	}
+	else {
+		std::cerr << "Failed to load image" << std::endl;
+	}
+}
 
-	if (result == NFD_OKAY) {
-
-		std::string stringPath = std::string(outPath);
-		NFD_FreePathU8(outPath);
-		return stringPath;
+static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+		return;
 	}
 
-	std::cerr << "Failed to get file from dialogue" << std::endl;
-	return "";
-}
+	if (key == GLFW_KEY_O && mods & (GLFW_MOD_CONTROL) && action == GLFW_PRESS) {
+		trigger_image_load_dialogue();
+		return;
+	}
 
-static void load_image(const std::string& path) {
-	
-}
-
-static void load_image_from_dialogue() {
-	const std::string image_path = get_file_dialogue(); 
-	if (!image_path.empty()) {
-		load_image(image_path);
-	};
+	if (key == GLFW_KEY_DELETE && action == GLFW_PRESS) {
+		if (display_images.size() > 0) {
+			display_images.pop_back();
+		}
+		return;
+	}
 }
 
 int main() {
+	stbi_set_flip_vertically_on_load(true);
 
-	
 	glfwSetErrorCallback(glfw_error_callback);
 	constexpr ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -53,7 +57,6 @@ int main() {
 		std::cerr << "Failed to initialize GLFW3" << std::endl;
 		return -1;
 	}
-
 
 	GLFWwindow* window = glfwCreateWindow(640, 480, "Hello World!", nullptr, nullptr);
 	if (!window) {
@@ -65,27 +68,16 @@ int main() {
 	glfwMakeContextCurrent(window);
 
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
-	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
-			return;
-		}
-
-		if (key == GLFW_KEY_O && mods & (GLFW_MOD_CONTROL) && action == GLFW_PRESS) {
-			load_image_from_dialogue();	
-		}
-	});
+	glfwSetKeyCallback(window, glfw_key_callback);
 
 	// Setup Dear ImGui context
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
-	(void) io;
+	(void)io;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
-	
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 130");
@@ -95,18 +87,14 @@ int main() {
 	bool showDemo = true;
 
 	NFD_Init();
-	
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
-		if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0)
-		{
+		if (glfwGetWindowAttrib(window, GLFW_ICONIFIED) != 0) {
 			ImGui_ImplGlfw_Sleep(10);
 			continue;
 		}
-		
-		// Rendering
 
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -117,12 +105,16 @@ int main() {
 		glViewport(0, 0, display_w, display_h);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-		
+
+		// Rendering
+		for (const display_image& display_image : display_images) {
+			draw_display_image(display_image);
+		}
+
 		if (ImGui::BeginMainMenuBar()) {
 			if (ImGui::BeginMenu("File")) {
 				if (ImGui::MenuItem("Open", "Ctrl+O")) {
-
-					load_image_from_dialogue();
+					trigger_image_load_dialogue();
 				}
 				if (ImGui::MenuItem("Save", "Ctrl+S")) {
 				}
@@ -134,8 +126,7 @@ int main() {
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 			GLFWwindow* backup_current_context = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
@@ -154,7 +145,6 @@ int main() {
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
-
 
 	return 0;
 }

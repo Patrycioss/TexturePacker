@@ -27,4 +27,5 @@ target_include_directories(dependencies PUBLIC
         glad/include
         glfw/include
         imgui
+        stb
 )
