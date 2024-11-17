@@ -1,6 +1,6 @@
 ﻿#include <iostream>
 
-#include "shader_program.hpp"
+#include "shaders/shader_program.hpp"
 
 ShaderProgram::ShaderProgram(const std::string& name)
 	: id(glCreateProgram()), name(name) {

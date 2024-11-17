@@ -7,7 +7,7 @@
 
 #include "image.hpp"
 #include "display_image.hpp"
-#include "shader_program.hpp"
+#include "shaders/shader_program.hpp"
 #include "texture_creation.hpp"
 #include "glm/fwd.hpp"
 #include "glm/ext/matrix_transform.hpp"
