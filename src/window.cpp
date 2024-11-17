@@ -6,8 +6,15 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
+
 window::window(const int width, const int height, const ImVec4 background_color)
 	: width(width), height(height), background_color(background_color) {
+}
+
+void framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
+	glViewport(0,0,width,height);
 }
 
 void glfw_error_callback(const int error, const char* description) {
@@ -27,6 +34,10 @@ bool window_setup(window* window, const GLFWkeyfun& key_callback) {
 		std::cerr << "Failed to create GLFW window" << std::endl;
 		return false;
 	}
+
+	glfwSetFramebufferSizeCallback(window->handle, framebuffer_resize_callback);
+
+	window_recalculate_projection(*window);
 
 	glfwMakeContextCurrent(window->handle);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -89,4 +100,17 @@ void clean_window(const window& window) {
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 	glfwDestroyWindow(window.handle);
+}
+
+void window_recalculate_projection(window& window) {
+	float left = 0;
+	float right = window.width;
+	float bottom = window.height;
+	float top = 0;
+
+	glm::mat4 orthographicMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+	// glm::mat4 zoomMatrix = glm::scale(glm::mat4(1.0f), {currentSettings.zoom, currentSettings.zoom, currentSettings.zoom});
+	// glm::mat4 zoomMatrix = glm::scale(glm::mat4(1.0f), {1,1,1});
+
+	window.projection = orthographicMatrix;
 }
