@@ -7,34 +7,43 @@
 
 #include "image.hpp"
 #include "display_image.hpp"
-#include "shader_loading.hpp"
+#include "shader_program.hpp"
 #include "texture_creation.hpp"
 #include "glm/fwd.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
 struct display_image {
 	uint32_t VAO;
-	uint32_t shader_program;
+	ShaderProgram shader_program;
 	uint32_t texture;
 	int model_location, projection_location;
 	glm::mat4x4 model;
+
+	explicit display_image(const std::string& name)
+		: shader_program(name) {
+	}
 };
 
 inline bool create_display_image(display_image* display_image, const image& image) {
-	int shaders[2]{};
-
-	if (!load_shader(&shaders[0], VERTEX_SHADER, RES + "/shaders/vertex.glsl", "vertex.glsl")) {
+	const Shader vertexShader{Shader::Type::VERTEX_SHADER};
+	if (!vertexShader.load(RES + "/shaders/vertex.glsl")) {
 		std::cerr << "Failed to load vertex shader so aborting draw_setup!" << std::endl;
 		return false;
-	}
+	};
 
-	if (!load_shader(&shaders[1], FRAGMENT_SHADER, RES + "/shaders/fragment.glsl", "fragment.glsl")) {
+	const Shader fragmentShader{Shader::Type::FRAGMENT_SHADER};
+	if (!fragmentShader.load(RES + "/shaders/fragment.glsl")) {
 		std::cerr << "Failed to load fragment shader so aborting draw_setup!" << std::endl;
 		return false;
 	}
 
-	create_shader_program(&display_image->shader_program, shaders, 2, "Shader Program");
-	std::cout << "Successfully created shader program!" << std::endl;
+	display_image->shader_program.attach_shader(vertexShader);
+	display_image->shader_program.attach_shader(fragmentShader);
+
+	if (!display_image->shader_program.link()) {
+		std::cerr << "Failed to link program so aborting draw_setup!" << std::endl;
+		return false;
+	}
 
 	constexpr float vertices[] = {
 		// positions            // texture coordinates
@@ -81,14 +90,13 @@ inline bool create_display_image(display_image* display_image, const image& imag
 
 		width = std::floor((float)image.width / factor);
 		height = 400;
-	}
-	else {
+	} else {
 		width = image.width;
 		height = image.height;
 	}
 
-	display_image->model_location = glGetUniformLocation(display_image->shader_program, "model");
-	display_image->projection_location = glGetUniformLocation(display_image->shader_program, "projection");
+	display_image->model_location = glGetUniformLocation(display_image->shader_program.get_id(), "model");
+	display_image->projection_location = glGetUniformLocation(display_image->shader_program.get_id(), "projection");
 	display_image->model = glm::mat4(1.0f);
 	// display_image->model = glm::translate(display_image->model, glm::vec3(500,400, 0.0f));
 	display_image->model = glm::scale(display_image->model, glm::vec3(width, height, 1.0f));
@@ -98,7 +106,7 @@ inline bool create_display_image(display_image* display_image, const image& imag
 }
 
 inline void draw_display_image(const display_image& display_image, const Window& window) {
-	glUseProgram(display_image.shader_program);
+	display_image.shader_program.use();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, display_image.texture);

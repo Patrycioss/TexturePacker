@@ -15,6 +15,7 @@ struct image {
 	} image_type;
 
 	int width, height, channels;
+	std::string path;
 	unsigned char* data;
 };
 
@@ -37,6 +38,8 @@ static std::string get_file_dialogue() {
 
 static bool load_image(const std::string& path, image* image) {
 	const std::filesystem::path extension = std::filesystem::path(path).extension();
+
+	image->path = path;
 
 	if (extension == ".jpg" || extension == ".jpeg") {
 		image->data = stbi_load(path.c_str(), &image->width, &image->height, &image->channels, 3);

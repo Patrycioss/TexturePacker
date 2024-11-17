@@ -10,7 +10,7 @@ static std::vector<display_image> display_images;
 inline void trigger_image_load_dialogue() {
 	image image{};
 	if (load_image_from_dialogue(&image)) {
-		display_image& display_image = display_images.emplace_back();
+		display_image& display_image = display_images.emplace_back(image.path);
 		create_display_image(&display_image, image);
 	} else {
 		std::cerr << "Failed to load image" << std::endl;
