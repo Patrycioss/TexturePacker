@@ -3,6 +3,7 @@
 
 add_subdirectory(glfw)
 add_subdirectory(nativefiledialog-extended)
+add_subdirectory(glm)
 
 
 add_library(dependencies STATIC
@@ -28,4 +29,5 @@ target_include_directories(dependencies PUBLIC
         glfw/include
         imgui
         stb
+        glm
 )

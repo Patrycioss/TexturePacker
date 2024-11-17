@@ -37,10 +37,10 @@ inline void glfw_key_callback(GLFWwindow* window, const int key, const int scanc
 }
 
 int main() {
-	window window{600, 400, {0.45f, 0.55f, 0.60f, 1.0f}};
+	window window{1000, 800, {0.45f, 0.55f, 0.60f, 1.0f}};
 
 	//Initialization
-	stbi_set_flip_vertically_on_load(true);
+	// stbi_set_flip_vertically_on_load(true);
 
 	if (!window_setup(&window, glfw_key_callback)) {
 		std::cerr << "Failed to setup window" << std::endl;
@@ -53,7 +53,7 @@ int main() {
 	                  [&]() {
 		                  // Rendering
 		                  for (const display_image& display_image : display_images) {
-			                  draw_display_image(display_image);
+			                  draw_display_image(display_image, window);
 		                  }
 
 		                  if (ImGui::BeginMainMenuBar()) {
