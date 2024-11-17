@@ -37,42 +37,42 @@ inline void glfw_key_callback(GLFWwindow* window, const int key, const int scanc
 }
 
 int main() {
-	window window{1000, 800, {0.45f, 0.55f, 0.60f, 1.0f}};
+	Window window{1000, 800, {0.45f, 0.55f, 0.60f, 1.0f}};
 
 	//Initialization
 	// stbi_set_flip_vertically_on_load(true);
 
-	if (!window_setup(&window, glfw_key_callback)) {
+	if (!window.setup(glfw_key_callback)) {
 		std::cerr << "Failed to setup window" << std::endl;
 		return -1;
 	}
 
 	NFD_Init();
 
-	window_start_loop(window,
-	                  [&]() {
-		                  // Rendering
-		                  for (const display_image& display_image : display_images) {
-			                  draw_display_image(display_image, window);
-		                  }
+	window.start_loop(
+		[&]() {
+			// Rendering
+			for (const display_image& display_image : display_images) {
+				draw_display_image(display_image, window);
+			}
 
-		                  if (ImGui::BeginMainMenuBar()) {
-			                  if (ImGui::BeginMenu("File")) {
-				                  if (ImGui::MenuItem("Open", "Ctrl+O")) {
-					                  trigger_image_load_dialogue();
-				                  }
-				                  if (ImGui::MenuItem("Save", "Ctrl+S")) {
-				                  }
-				                  ImGui::EndMenu();
-			                  }
-			                  ImGui::EndMainMenuBar();
-		                  }
-		                  ImGui::Render();
-	                  });
+			if (ImGui::BeginMainMenuBar()) {
+				if (ImGui::BeginMenu("File")) {
+					if (ImGui::MenuItem("Open", "Ctrl+O")) {
+						trigger_image_load_dialogue();
+					}
+					if (ImGui::MenuItem("Save", "Ctrl+S")) {
+					}
+					ImGui::EndMenu();
+				}
+				ImGui::EndMainMenuBar();
+			}
+			ImGui::Render();
+		});
 
 	// Cleanup
 	NFD_Quit();
-	clean_window(window);
+	window.clean();
 	glfwTerminate();
 
 	return 0;

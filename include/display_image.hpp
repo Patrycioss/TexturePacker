@@ -97,7 +97,7 @@ inline bool create_display_image(display_image* display_image, const image& imag
 	return true;
 }
 
-inline void draw_display_image(const display_image& display_image, const window& window) {
+inline void draw_display_image(const display_image& display_image, const Window& window) {
 	glUseProgram(display_image.shader_program);
 
 	glActiveTexture(GL_TEXTURE0);
