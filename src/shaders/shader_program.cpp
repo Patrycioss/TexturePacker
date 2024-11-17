@@ -6,8 +6,16 @@ ShaderProgram::ShaderProgram(const std::string& name)
 	: id(glCreateProgram()), name(name) {
 }
 
+ShaderProgram::ShaderProgram(ShaderProgram&& shaderProgram) noexcept
+	: id(shaderProgram.id) {
+	shaderProgram.moved = true;
+}
+
 ShaderProgram::~ShaderProgram() {
-	glDeleteProgram(this->id);
+	if (moved != true) {
+		std::cout << "Deleting shader program: " << name << std::endl;
+		glDeleteProgram(this->id);
+	}
 }
 
 void ShaderProgram::attach_shader(const Shader& shader) const {
@@ -17,7 +25,7 @@ void ShaderProgram::attach_shader(const Shader& shader) const {
 bool ShaderProgram::link() const {
 	glLinkProgram(this->id);
 
-	if (!this->check_compilation_status()) {
+	if (!check_compilation_status()) {
 		glDeleteProgram(this->id);
 		return false;
 	}
@@ -30,8 +38,8 @@ bool ShaderProgram::check_compilation_status() const {
 	glGetProgramiv(this->id, GL_LINK_STATUS, &success);
 
 	if (!success) {
-		char infoLog[512];
-		glGetProgramInfoLog(this->id, 512, nullptr, infoLog);
+		char infoLog[1024];
+		glGetProgramInfoLog(this->id, 1024, nullptr, infoLog);
 		std::cerr << "ShaderProgram with name: '" << this->name << "' failed! Info: '\n" << infoLog << "'" << std::endl;
 		return false;
 	}

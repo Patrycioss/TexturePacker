@@ -10,9 +10,11 @@ class ShaderProgram {
 	private:
 		uint32_t id;
 		std::string name;
+		bool moved = false;
 
 	public:
 		explicit ShaderProgram(const std::string& name);
+		ShaderProgram(ShaderProgram&& shaderProgram) noexcept;
 		~ShaderProgram();
 
 		void attach_shader(const Shader& shader) const;
