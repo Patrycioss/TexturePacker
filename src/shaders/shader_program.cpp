@@ -17,7 +17,7 @@ void ShaderProgram::attach_shader(const Shader& shader) const {
 bool ShaderProgram::link() const {
 	glLinkProgram(this->id);
 
-	if (!check_compilation_status()) {
+	if (!this->check_compilation_status()) {
 		glDeleteProgram(this->id);
 		return false;
 	}

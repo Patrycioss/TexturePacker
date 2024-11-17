@@ -20,7 +20,7 @@ bool Shader::load(const std::string& path) const {
 		glShaderSource(this->id, 1, &src_str, nullptr);
 		glCompileShader(this->id);
 
-		return check_shader_compilation();
+		return this->check_shader_compilation();
 	}
 	return false;
 }
