@@ -1,5 +1,7 @@
 ﻿#include "app.hpp"
 
+#include "input.hpp"
+
 App* App::instance;
 
 static void glfw_key_callback_invoker(GLFWwindow* window, const int key, const int scancode, const int action, const int mods) {
@@ -27,6 +29,8 @@ void App::start() {
 		throw std::runtime_error("Failed to setup window!");
 	}
 
+	Input::initialize(&window);
+
 	if (!this->renderer.initialize()) {
 		throw std::runtime_error("Failed to initialize Renderer!");
 	}
@@ -36,7 +40,7 @@ void App::start() {
 	this->window.start_loop(
 		[&]() {
 			// Input
-			if (glfwGetKey(window.handle, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+			if (Input::get_key_pressed(GLFW_KEY_RIGHT)) {
 				this->display_textures[0].set_position(display_textures[0].get_position() + glm::vec2{1.0f, 0.0f});
 			}
 
