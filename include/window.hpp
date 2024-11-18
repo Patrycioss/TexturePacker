@@ -2,11 +2,10 @@
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <glm/mat4x4.hpp>
 
 #include <functional>
-#include <imgui.h>
-
-#include "glm/mat4x4.hpp"
 
 class Window {
 	public:
@@ -25,7 +24,6 @@ class Window {
 
 	public:
 		void glfw_framebuffer_resize_callback(GLFWwindow* window, int width, int height);
-		void glfw_error_callback(int error, const char* description);
 
 		bool setup(const GLFWkeyfun& key_callback);
 		void start_loop(const std::function<void()>& render);
