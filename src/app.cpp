@@ -6,7 +6,7 @@ static void glfw_key_callback_invoker(GLFWwindow* window, const int key, const i
 	App::get_instance()->glfw_key_callback(window, key, scancode, action, mods);
 }
 
-App::App(int width, int height, const ImVec4& background_color)
+App::App(const int width, const int height, const ImVec4& background_color)
 	: window(width, height, background_color) {
 	if (instance != nullptr) {
 		throw std::runtime_error("Cannot create a second App instance!");
@@ -22,31 +22,31 @@ App::~App() {
 }
 
 void App::start() {
-	if (!window.setup(glfw_key_callback_invoker)) {
+	if (!this->window.setup(glfw_key_callback_invoker)) {
 		std::cerr << "Failed to setup window" << std::endl;
 		throw std::runtime_error("Failed to setup window!");
 	}
 
-	if (!renderer.initialize()) {
+	if (!this->renderer.initialize()) {
 		throw std::runtime_error("Failed to initialize Renderer!");
 	}
 
 	NFD_Init();
 
-	window.start_loop(
+	this->window.start_loop(
 		[&]() {
 			// Rendering
 			int i = 0;
 			for (const DisplayImage& display_image : display_images) {
 				i++;
-				renderer.draw_display_image(display_image);
+				this->renderer.draw_display_image(display_image);
 			}
 			std::cout << i << " times!" << std::endl;
 
 			if (ImGui::BeginMainMenuBar()) {
 				if (ImGui::BeginMenu("File")) {
 					if (ImGui::MenuItem("Open", "Ctrl+O")) {
-						trigger_image_load_dialogue();
+						this->trigger_image_load_dialogue();
 					}
 					if (ImGui::MenuItem("Save", "Ctrl+S")) {
 					}
@@ -65,13 +65,13 @@ void App::glfw_key_callback(GLFWwindow* window, const int key, int scancode, con
 	}
 
 	if (key == GLFW_KEY_O && (mods & (GLFW_MOD_CONTROL)) && action == GLFW_PRESS) {
-		trigger_image_load_dialogue();
+		this->trigger_image_load_dialogue();
 		return;
 	}
 
 	if (key == GLFW_KEY_DELETE && action == GLFW_PRESS) {
-		if (!display_images.empty()) {
-			display_images.pop_back();
+		if (!this->display_images.empty()) {
+			this->display_images.pop_back();
 		}
 		return;
 	}
@@ -92,6 +92,6 @@ void App::trigger_image_load_dialogue() {
 	Image image{};
 
 	if (image.load(path)) {
-		display_images.emplace_back(image);
+		this->display_images.emplace_back(image);
 	};
 }
