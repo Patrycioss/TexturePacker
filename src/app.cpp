@@ -29,6 +29,8 @@ void App::start() {
 		throw std::runtime_error("Failed to setup window!");
 	}
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Input::initialize(&window);
 
 	if (!this->renderer.initialize()) {
