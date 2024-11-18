@@ -1,6 +1,7 @@
 ﻿#include <window.hpp>
 
 #include "renderer.hpp"
+#include "matrix_debug.hpp"
 
 Renderer::Renderer()
 	: default_shader("default_renderer_shader_program") {
@@ -76,6 +77,8 @@ void Renderer::draw_display_image(const DisplayImage& display_image) const {
 
 	glActiveTexture(GL_TEXTURE0);
 	display_image.get_texture().bind();
+
+	// std::cout << matrix_to_string(display_image.get_model()) << std::endl;
 
 	glUniformMatrix4fv(this->model_location, 1, false, &display_image.get_model()[0][0]);
 	glUniformMatrix4fv(this->projection_location, 1, false, &Window::get_instance().projection[0][0]);
