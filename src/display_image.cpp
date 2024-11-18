@@ -25,7 +25,7 @@ DisplayImage::DisplayImage(const Image& image)
 }
 
 DisplayImage::DisplayImage(DisplayImage&& other) noexcept
-	: texture(std::move(other.texture)), width(other.width), height(other.height) {
+	: texture(std::move(other.texture)), width(other.width), height(other.height), model(std::move(other.model)) {
 }
 
 DisplayImage::~DisplayImage() {
