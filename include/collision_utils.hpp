@@ -1,8 +1,10 @@
-﻿//
-// Created by patri on 18/11/2024.
-//
+﻿#pragma once
 
-#ifndef COLLISION_UTILS_HPP
-#define COLLISION_UTILS_HPP
+#include <glm/vec2.hpp>
 
-#endif //COLLISION_UTILS_HPP
+inline bool collides_point_rectangle(const glm::vec2& point, const glm::vec2& rect_position, const glm::vec2& rect_size) {
+	return point.x >= rect_position.x
+		&& point.x <= rect_position.x + rect_size.x
+		&& point.y >= rect_position.y
+		&& point.y <= rect_position.y + rect_size.y;
+}

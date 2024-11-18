@@ -15,6 +15,10 @@ class App {
 		Window window;
 		Renderer renderer;
 
+		bool has_selected_display_texture;
+		DisplayTexture* selected_display_texture = nullptr;
+		glm::vec2 selected_display_texture_offset;
+
 		const nfdu8filteritem_t image_filters[1]{"Images code", "png,jpg,jpeg"};
 		const nfdopendialogu8args_t image_open_args = {image_filters, 1};
 
@@ -31,4 +35,5 @@ class App {
 
 	private:
 		void trigger_image_load_dialogue();
+		void get_image_hovering_over();
 };
