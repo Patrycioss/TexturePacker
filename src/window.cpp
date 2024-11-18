@@ -9,59 +9,78 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
-window::window(const int width, const int height, const ImVec4 background_color)
+Window* Window::instance;
+bool Window::instance_provided = false;
+
+Window::Window(const int width, const int height, const ImVec4 background_color)
 	: width(width), height(height), background_color(background_color) {
+	if (!instance_provided) {
+		instance = this;
+		instance_provided = true;
+	}
+	else {
+		throw std::runtime_error("Multi-Window support is not available for this application!");
+	}
 }
 
-void framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
-	glViewport(0,0,width,height);
+void Window::glfw_framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
+	glViewport(0, 0, width, height);
 }
 
-void glfw_error_callback(const int error, const char* description) {
+void Window::glfw_error_callback(const int error, const char* description) {
 	std::cerr << "GLFW Error " << error << ": " << description << std::endl;
 }
 
-bool window_setup(window* window, const GLFWkeyfun& key_callback) {
+
+static void glfw_error_callback_invoker(int error, const char* description) {
+	Window::get_instance().glfw_error_callback(error, description);
+}
+
+static void glfw_framebuffer_resize_callback_invoker(GLFWwindow* window, int width, int height) {
+	Window::get_instance().glfw_framebuffer_resize_callback(window, width, height);
+}
+
+bool Window::setup(const GLFWkeyfun& key_callback) {
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW3" << std::endl;
 		return false;
 	}
 
-	glfwSetErrorCallback(glfw_error_callback);
+	glfwSetErrorCallback(glfw_error_callback_invoker);
 
-	window->handle = glfwCreateWindow(window->width, window->height, "Texture Packer", nullptr, nullptr);
-	if (!window->handle) {
+	handle = glfwCreateWindow(width, height, "Texture Packer", nullptr, nullptr);
+	if (!handle) {
 		std::cerr << "Failed to create GLFW window" << std::endl;
 		return false;
 	}
 
-	glfwSetFramebufferSizeCallback(window->handle, framebuffer_resize_callback);
+	glfwSetFramebufferSizeCallback(handle, glfw_framebuffer_resize_callback_invoker);
 
-	window_recalculate_projection(*window);
+	recalculate_projection();
 
-	glfwMakeContextCurrent(window->handle);
+	glfwMakeContextCurrent(handle);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-	glfwSetKeyCallback(window->handle, key_callback);
+	glfwSetKeyCallback(handle, key_callback);
 
 	// Setup Dear ImGui context
 	ImGui::CreateContext();
-	window->imgui_io = &ImGui::GetIO();
-	window->imgui_io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+	imgui_io = &ImGui::GetIO();
+	imgui_io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Game pad Controls
-	window->imgui_io->ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
-	window->imgui_io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+	imgui_io->ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
+	imgui_io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
 
-	ImGui_ImplGlfw_InitForOpenGL(window->handle, true);
+	ImGui_ImplGlfw_InitForOpenGL(handle, true);
 	ImGui_ImplOpenGL3_Init("#version 130");
 	return true;
 }
 
-void window_start_loop(window& window, const std::function<void()>& render) {
-	while (!glfwWindowShouldClose(window.handle)) {
+void Window::start_loop(const std::function<void()>& render) {
+	while (!glfwWindowShouldClose(handle)) {
 		glfwPollEvents();
 
-		if (glfwGetWindowAttrib(window.handle, GLFW_ICONIFIED) != 0) {
+		if (glfwGetWindowAttrib(handle, GLFW_ICONIFIED) != 0) {
 			ImGui_ImplGlfw_Sleep(10);
 			continue;
 		}
@@ -72,45 +91,49 @@ void window_start_loop(window& window, const std::function<void()>& render) {
 		ImGui::NewFrame();
 
 		// Clear to background colour
-		glfwGetFramebufferSize(window.handle, &window.viewport_width, &window.viewport_height);
-		glViewport(0, 0, window.viewport_width, window.viewport_height);
+		glfwGetFramebufferSize(handle, &viewport_width, &viewport_height);
+		glViewport(0, 0, viewport_width, viewport_height);
 		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(window.background_color.x * window.background_color.w,
-		             window.background_color.y * window.background_color.w,
-		             window.background_color.z * window.background_color.w,
-		             window.background_color.w);
+		glClearColor(background_color.x * background_color.w,
+		             background_color.y * background_color.w,
+		             background_color.z * background_color.w,
+		             background_color.w);
 
 		render();
 
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-		if (window.imgui_io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+		if (imgui_io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
 			GLFWwindow* backup_current_context = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
 
-		glfwSwapBuffers(window.handle);
+		glfwSwapBuffers(handle);
 	}
 }
 
-void clean_window(const window& window) {
+void Window::clean() const {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-	glfwDestroyWindow(window.handle);
+	glfwDestroyWindow(handle);
 }
 
-void window_recalculate_projection(window& window) {
+void Window::recalculate_projection() {
 	float left = 0;
-	float right = window.width;
-	float bottom = window.height;
+	float right = (float)width;
+	float bottom = (float)height;
 	float top = 0;
 
-	glm::mat4 orthographicMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+	const glm::mat4 orthographicMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 	// glm::mat4 zoomMatrix = glm::scale(glm::mat4(1.0f), {currentSettings.zoom, currentSettings.zoom, currentSettings.zoom});
 	// glm::mat4 zoomMatrix = glm::scale(glm::mat4(1.0f), {1,1,1});
 
-	window.projection = orthographicMatrix;
+	projection = orthographicMatrix;
+}
+
+Window& Window::get_instance() {
+	return *instance;
 }
