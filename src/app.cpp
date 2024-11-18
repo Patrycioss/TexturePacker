@@ -38,6 +38,8 @@ void App::start() {
 		throw std::runtime_error("Failed to initialize Renderer!");
 	}
 
+	renderer.enable_debug(true);
+
 	NFD_Init();
 
 	bool holdingLMB = false;

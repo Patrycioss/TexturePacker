@@ -15,7 +15,7 @@ class App {
 		Window window;
 		Renderer renderer;
 
-		bool has_selected_display_texture;
+		bool has_selected_display_texture = false;
 		DisplayTexture* selected_display_texture = nullptr;
 		glm::vec2 selected_display_texture_offset;
 

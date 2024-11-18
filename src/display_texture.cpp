@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <window.hpp>
+#include <random>
 
 DisplayTexture::DisplayTexture(const Image& image)
 	: original_size(image.width, image.height), texture(image), size(this->original_size) {
@@ -17,9 +18,18 @@ DisplayTexture::DisplayTexture(const Image& image)
 		this->size.y = 400;
 	}
 
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> distribution(30, 70);
+
+	float r = distribution(gen)/100.0f;
+	float g = distribution(gen)/100.0f;
+	float b = distribution(gen)/100.0f;
+	std::cout << r << " " << g << " " << b << std::endl;
+	
+	debug_color = {r,g,b, 1};
+
 	recalculate_model();
-
-
 }
 
 DisplayTexture::DisplayTexture(DisplayTexture&& other) noexcept
@@ -80,4 +90,8 @@ const float& DisplayTexture::get_rotation() const {
 
 const glm::ivec2& DisplayTexture::get_original_size() const {
 	return original_size;
+}
+
+const glm::vec4& DisplayTexture::get_debug_color() const {
+	return debug_color;
 }
