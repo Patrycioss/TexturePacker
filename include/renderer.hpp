@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <display_image.hpp>
+#include <display_texture.hpp>
 #include <shaders/shader_program.hpp>
 
 class Renderer {
@@ -15,5 +15,5 @@ class Renderer {
 		~Renderer();
 
 		bool initialize();
-		void draw_display_image(const DisplayImage& display_image) const;
+		void draw_display_texture(const DisplayTexture& display_image) const;
 };

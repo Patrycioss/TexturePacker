@@ -4,14 +4,14 @@
 #include <vector>
 
 #include "window.hpp"
-#include "display_image.hpp"
+#include "display_texture.hpp"
 
 class App {
 	public:
 
 	private:
 		static App* instance;
-		std::vector<DisplayImage> display_images{};
+		std::vector<DisplayTexture> display_images{};
 		Window window;
 		Renderer renderer;
 

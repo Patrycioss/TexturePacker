@@ -4,7 +4,7 @@
 
 #include "file_dialogue.hpp"
 
-class DisplayImage;
+class DisplayTexture;
 
 struct Image {
 	enum image_type {

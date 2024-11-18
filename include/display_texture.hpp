@@ -9,7 +9,7 @@
 
 class Window;
 
-class DisplayImage {
+class DisplayTexture {
 	public:
 
 	private:
@@ -22,10 +22,10 @@ class DisplayImage {
 		bool moved = false;
 
 	public:
-		explicit DisplayImage(const Image& image);
-		DisplayImage(DisplayImage&& other) noexcept;
-		DisplayImage(DisplayImage& other) = delete;
-		~DisplayImage();
+		explicit DisplayTexture(const Image& image);
+		DisplayTexture(DisplayTexture&& other) noexcept;
+		DisplayTexture(DisplayTexture& other) = delete;
+		~DisplayTexture();
 
 		const glm::mat4x4& get_model() const;
 		const Texture& get_texture() const;

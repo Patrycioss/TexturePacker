@@ -72,7 +72,7 @@ bool Renderer::initialize() {
 	return true;
 }
 
-void Renderer::draw_display_image(const DisplayImage& display_image) const {
+void Renderer::draw_display_texture(const DisplayTexture& display_image) const {
 	this->default_shader.use();
 
 	glActiveTexture(GL_TEXTURE0);

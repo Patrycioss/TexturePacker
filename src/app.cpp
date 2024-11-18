@@ -37,9 +37,9 @@ void App::start() {
 		[&]() {
 			// Rendering
 			int i = 0;
-			for (const DisplayImage& display_image : display_images) {
+			for (const DisplayTexture& display_image : display_images) {
 				i++;
-				this->renderer.draw_display_image(display_image);
+				this->renderer.draw_display_texture(display_image);
 			}
 			std::cout << i << " times!" << std::endl;
 

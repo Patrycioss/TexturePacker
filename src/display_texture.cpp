@@ -1,9 +1,9 @@
-﻿#include "display_image.hpp"
+﻿#include "display_texture.hpp"
 
 #include <iostream>
 #include <window.hpp>
 
-DisplayImage::DisplayImage(const Image& image)
+DisplayTexture::DisplayTexture(const Image& image)
 	: texture(image), width(image.width), height(image.height) {
 	if (image.width > 400) {
 		const float factor = (float)image.width / 400;
@@ -24,17 +24,17 @@ DisplayImage::DisplayImage(const Image& image)
 	this->model = glm::scale(this->model, glm::vec3(width, height, 1.0f));
 }
 
-DisplayImage::DisplayImage(DisplayImage&& other) noexcept
+DisplayTexture::DisplayTexture(DisplayTexture&& other) noexcept
 	: texture(std::move(other.texture)), width(other.width), height(other.height), model(std::move(other.model)) {
 }
 
-DisplayImage::~DisplayImage() {
+DisplayTexture::~DisplayTexture() {
 }
 
-const glm::mat4x4& DisplayImage::get_model() const {
+const glm::mat4x4& DisplayTexture::get_model() const {
 	return model;
 }
 
-const Texture& DisplayImage::get_texture() const {
+const Texture& DisplayTexture::get_texture() const {
 	return texture;
 }
