@@ -3,11 +3,11 @@
 #include "shaders/shader_program.hpp"
 
 ShaderProgram::ShaderProgram(const std::string& name)
-	: id(glCreateProgram()), name(name) {
+	: id(), name(name) {
 }
 
 ShaderProgram::ShaderProgram(ShaderProgram&& shaderProgram) noexcept
-	: id(shaderProgram.id) {
+	: id(shaderProgram.id), name(std::move(shaderProgram.name)) {
 	shaderProgram.moved = true;
 }
 
@@ -16,6 +16,10 @@ ShaderProgram::~ShaderProgram() {
 		std::cout << "Deleting shader program: " << name << std::endl;
 		glDeleteProgram(this->id);
 	}
+}
+
+void ShaderProgram::create() {
+	this->id = glCreateProgram();
 }
 
 void ShaderProgram::attach_shader(const Shader& shader) const {

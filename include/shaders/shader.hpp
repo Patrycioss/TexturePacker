@@ -19,7 +19,7 @@ class Shader {
 		explicit Shader(Type type);
 		~Shader();
 
-		bool load(const std::string& path) const;
+		bool load(const std::string& path);
 		bool check_shader_compilation() const;
 
 		[[nodiscard]] const Type& get_type() const;

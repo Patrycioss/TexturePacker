@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <renderer.hpp>
 #include <vector>
 
 #include "window.hpp"
@@ -12,6 +13,7 @@ class App {
 		static App* instance;
 		std::vector<DisplayImage> display_images{};
 		Window window;
+		Renderer renderer;
 
 		const nfdu8filteritem_t image_filters[1]{"Images code", "png,jpg,jpeg"};
 		const nfdopendialogu8args_t image_open_args = {image_filters, 1};

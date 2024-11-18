@@ -27,14 +27,21 @@ void App::start() {
 		throw std::runtime_error("Failed to setup window!");
 	}
 
+	if (!renderer.initialize()) {
+		throw std::runtime_error("Failed to initialize Renderer!");
+	}
+
 	NFD_Init();
 
 	window.start_loop(
 		[&]() {
 			// Rendering
+			int i = 0;
 			for (const DisplayImage& display_image : display_images) {
-				display_image.draw(window);
+				i++;
+				renderer.draw_display_image(display_image);
 			}
+			std::cout << i << " times!" << std::endl;
 
 			if (ImGui::BeginMainMenuBar()) {
 				if (ImGui::BeginMenu("File")) {
@@ -85,12 +92,6 @@ void App::trigger_image_load_dialogue() {
 	Image image{};
 
 	if (image.load(path)) {
-		display_images.reserve(display_images.size() + 1);
-		DisplayImage& display_image = display_images.emplace_back(image);
-
-		if (!display_image.create()) {
-			std::cerr << "Failed to create display image" << std::endl;
-			display_images.pop_back();
-		}
+		display_images.emplace_back(image);
 	};
 }

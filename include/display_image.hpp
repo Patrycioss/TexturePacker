@@ -13,22 +13,22 @@ class DisplayImage {
 	public:
 
 	private:
-		uint32_t VAO{};
-		ShaderProgram shader_program;
-		Texture texture;
-		int model_location{}, projection_location{};
 		glm::mat4x4 model{1.0f};
+		Texture texture;
 
-		int width, height;
+		int width;
+		int height;
+
+		bool moved = false;
 
 	public:
 		explicit DisplayImage(const Image& image);
 		DisplayImage(DisplayImage&& other) noexcept;
-		DisplayImage(DisplayImage& other)= delete;
+		DisplayImage(DisplayImage& other) = delete;
 		~DisplayImage();
 
-		bool create();
-		void draw(const Window& window) const;
+		const glm::mat4x4& get_model() const;
+		const Texture& get_texture() const;
 
 	private:
 };

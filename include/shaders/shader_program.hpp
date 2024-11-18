@@ -17,6 +17,7 @@ class ShaderProgram {
 		ShaderProgram(ShaderProgram&& shaderProgram) noexcept;
 		~ShaderProgram();
 
+		void create();
 		void attach_shader(const Shader& shader) const;
 		bool link() const;
 		bool check_compilation_status() const;

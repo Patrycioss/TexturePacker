@@ -4,14 +4,15 @@
 #include "read_file_utils.hpp"
 
 Shader::Shader(const Type type)
-	: id(glCreateShader((GLenum)type)), type(type) {
+	: type(type) {
 }
 
 Shader::~Shader() {
 	glDeleteShader(this->id);
 }
 
-bool Shader::load(const std::string& path) const {
+bool Shader::load(const std::string& path) {
+	this->id = glCreateShader((GLenum)this->type);
 	std::string source;
 
 	if (read_file_to_string(path, &source)) {
