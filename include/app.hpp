@@ -11,7 +11,7 @@ class App {
 
 	private:
 		static App* instance;
-		std::vector<DisplayTexture> display_images{};
+		std::vector<DisplayTexture> display_textures{};
 		Window window;
 		Renderer renderer;
 

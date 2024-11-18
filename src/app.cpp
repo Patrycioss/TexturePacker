@@ -35,10 +35,18 @@ void App::start() {
 
 	this->window.start_loop(
 		[&]() {
+			// Input
+			if (glfwGetKey(window.handle, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+				this->display_textures[0].set_position(display_textures[0].get_position() + glm::vec2{1.0f, 0.0f});
+			}
+
 			// Rendering
 			int i = 0;
-			for (const DisplayTexture& display_image : display_images) {
+			for (DisplayTexture& display_image : display_textures) {
 				i++;
+				if (display_image.is_marked_dirty()) {
+					display_image.recalculate_model();
+				}
 				this->renderer.draw_display_texture(display_image);
 			}
 			std::cout << i << " times!" << std::endl;
@@ -70,8 +78,8 @@ void App::glfw_key_callback(GLFWwindow* window, const int key, int scancode, con
 	}
 
 	if (key == GLFW_KEY_DELETE && action == GLFW_PRESS) {
-		if (!this->display_images.empty()) {
-			this->display_images.pop_back();
+		if (!this->display_textures.empty()) {
+			this->display_textures.pop_back();
 		}
 		return;
 	}
@@ -92,6 +100,6 @@ void App::trigger_image_load_dialogue() {
 	Image image{};
 
 	if (image.load(path)) {
-		this->display_images.emplace_back(image);
+		this->display_textures.emplace_back(image);
 	};
 }
