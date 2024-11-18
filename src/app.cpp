@@ -1,6 +1,7 @@
 ﻿#include "app.hpp"
 
 #include "input.hpp"
+#include "collision_utils.hpp"
 
 App* App::instance;
 
@@ -39,23 +40,42 @@ void App::start() {
 
 	NFD_Init();
 
+	bool holdingLMB = false;
+
 	this->window.start_loop(
 		[&]() {
 			// Input
 			if (Input::get_key_pressed(GLFW_KEY_RIGHT)) {
-				this->display_textures[0].set_position(display_textures[0].get_position() + glm::vec2{1.0f, 0.0f});
+				this->display_textures[0].set_position(this->display_textures[0].get_position() + glm::vec2{1.0f, 0.0f});
+			}
+
+			if (Input::get_mouse_button_pressed(GLFW_MOUSE_BUTTON_LEFT)) {
+				if (!holdingLMB) {
+					holdingLMB = true;
+					get_image_hovering_over();
+				}
+
+				if (this->has_selected_display_texture){
+					this->selected_display_texture->set_position(Input::get_mouse_position() - this->selected_display_texture_offset);
+				}
+				
+			} else {
+				if (holdingLMB) {
+					this->has_selected_display_texture = false;
+					this->selected_display_texture = nullptr;
+					holdingLMB = false;
+				}
 			}
 
 			// Rendering
 			int i = 0;
-			for (DisplayTexture& display_image : display_textures) {
+			for (DisplayTexture& display_image : this->display_textures) {
 				i++;
 				if (display_image.is_marked_dirty()) {
 					display_image.recalculate_model();
 				}
 				this->renderer.draw_display_texture(display_image);
 			}
-			std::cout << i << " times!" << std::endl;
 
 			if (ImGui::BeginMainMenuBar()) {
 				if (ImGui::BeginMenu("File")) {
@@ -108,4 +128,25 @@ void App::trigger_image_load_dialogue() {
 	if (image.load(path)) {
 		this->display_textures.emplace_back(image);
 	};
+}
+
+void App::get_image_hovering_over() {
+	
+	if (this->display_textures.empty()) {
+		return;
+	}
+	
+	const glm::vec2 mouse_position = Input::get_mouse_position();
+
+	for (DisplayTexture& display_texture : this->display_textures) {
+		// For now first come first serve, TODO: Probably don't do this
+		const glm::vec2& position = display_texture.get_position();
+		const glm::vec2& size = display_texture.get_size();
+		if (collides_point_rectangle(mouse_position, position, size)) {
+			this->selected_display_texture = &display_texture;
+			this->has_selected_display_texture = true;
+			this->selected_display_texture_offset = mouse_position - position;
+			return;
+		}
+	}
 }

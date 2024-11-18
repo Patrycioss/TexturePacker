@@ -14,7 +14,8 @@ class Input {
 		static void initialize(Window* window);
 	
 		static const glm::vec2& get_mouse_position();
-		[[nodiscard]] static bool get_key_pressed(int key); 
+		[[nodiscard]] static bool get_key_pressed(int key);
+		[[nodiscard]] static bool get_mouse_button_pressed(int button);
 
 	private:
 		Input() = delete;

@@ -13,8 +13,12 @@ const glm::vec2& Input::get_mouse_position() {
 	return Input::mouse_position;
 }
 
-bool Input::get_key_pressed(int key) {
+bool Input::get_key_pressed(const int key) {
 	return glfwGetKey(Input::window->handle, key) == GLFW_PRESS;
+}
+
+bool Input::get_mouse_button_pressed(const int button) {
+	return glfwGetMouseButton(Input::window->handle, button) == GLFW_PRESS;
 }
 
 void Input::mouse_position_callback(GLFWwindow* window, const double x_position, const double y_position) {
