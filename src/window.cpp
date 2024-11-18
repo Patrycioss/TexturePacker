@@ -24,7 +24,10 @@ Window::Window(const int width, const int height, const ImVec4 background_color)
 }
 
 void Window::glfw_framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
+	this->width = width;
+	this->height = height;
 	glViewport(0, 0, width, height);
+	recalculate_projection();
 }
 
 void Window::glfw_error_callback(const int error, const char* description) {
