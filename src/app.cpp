@@ -32,6 +32,7 @@ void App::start() {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	Input::initialize(&window);
 
 	if (!this->renderer.initialize()) {
@@ -70,9 +71,7 @@ void App::start() {
 			}
 
 			// Rendering
-			int i = 0;
 			for (DisplayTexture& display_image : this->display_textures) {
-				i++;
 				if (display_image.is_marked_dirty()) {
 					display_image.recalculate_model();
 				}

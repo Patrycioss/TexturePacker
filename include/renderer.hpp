@@ -9,7 +9,6 @@ class Renderer {
 		ShaderProgram default_shader;
 		ShaderProgram debug_shader;
 
-		glm::vec4 debug_color{1.0f, 1.0f, 1.0f, 1.0f};
 		bool is_debug_enabled = false;
 
 	public:

@@ -22,20 +22,19 @@ DisplayTexture::DisplayTexture(const Image& image)
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> distribution(30, 70);
 
-	float r = distribution(gen)/100.0f;
-	float g = distribution(gen)/100.0f;
-	float b = distribution(gen)/100.0f;
+	float r = distribution(gen) / 100.0f;
+	float g = distribution(gen) / 100.0f;
+	float b = distribution(gen) / 100.0f;
 	std::cout << r << " " << g << " " << b << std::endl;
-	
-	debug_color = {r,g,b, 1};
+
+	debug_color = {r, g, b, 1};
 
 	recalculate_model();
 }
 
 DisplayTexture::DisplayTexture(DisplayTexture&& other) noexcept
 	: original_size(other.original_size), model(std::move(other.model)), texture(std::move(other.texture)), position(other.position),
-	  size(other.size),
-	  rotation(other.rotation) {
+	  size(other.size), rotation(other.rotation), debug_color(other.debug_color) {
 }
 
 DisplayTexture::~DisplayTexture() {

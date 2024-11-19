@@ -2,6 +2,7 @@
 
 #include "renderer.hpp"
 #include "matrix_debug.hpp"
+#include "glm/gtc/type_ptr.inl"
 
 Renderer::Renderer()
 	: default_shader("default_renderer_shader_program"), debug_shader("debug_renderer_shader_program") {
@@ -33,24 +34,24 @@ void Renderer::enable_debug(const bool enable) {
 void Renderer::draw_display_texture(const DisplayTexture& display_image) {
 	this->default_shader.use();
 
-	default_shader.set_matrix4x4("model", display_image.get_model());
-	default_shader.set_matrix4x4("projection", Window::get_instance().projection);
+	this->default_shader.set_matrix4x4("model", display_image.get_model());
+	this->default_shader.set_matrix4x4("projection", Window::get_instance().projection);
 
 	glActiveTexture(GL_TEXTURE0);
 	display_image.get_texture().bind();
 
-	glBindVertexArray(default_VAO);
+	glBindVertexArray(this->default_VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 	glBindVertexArray(0);
 
 	if (this->is_debug_enabled) {
 		this->debug_shader.use();
 
-		debug_shader.set_matrix4x4("model", display_image.get_model());
-		debug_shader.set_matrix4x4("projection", Window::get_instance().projection);
-		debug_shader.set_vec4("debug_color", display_image.get_debug_color());
+		this->debug_shader.set_matrix4x4("model", display_image.get_model());
+		this->debug_shader.set_matrix4x4("projection", Window::get_instance().projection);
+		this->debug_shader.set_vec4("debug_color", display_image.get_debug_color());
 
-		glBindVertexArray(debug_VAO);
+		glBindVertexArray(this->debug_VAO);
 		// Draw 8 for the 8 points to draw the lines between :)
 		glDrawArrays(GL_LINES, 0, 8);
 		glBindVertexArray(0);
@@ -155,14 +156,16 @@ bool Renderer::init_debug_shader() {
 		1.0f, 0.0f, // top right
 	};
 
-	uint32_t VBO;
+	uint32_t VBO, EBO;
 
 	glGenVertexArrays(1, &debug_VAO);
 	glGenBuffers(1, &VBO);
+	glGenBuffers(1, &EBO);
 
 	glBindVertexArray(debug_VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
 
