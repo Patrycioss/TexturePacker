@@ -2,6 +2,10 @@
 
 #include "shaders/shader_program.hpp"
 
+#include <Input.hpp>
+
+#include "glm/gtc/type_ptr.hpp"
+
 ShaderProgram::ShaderProgram(const std::string& name)
 	: id(), name(name) {
 }
@@ -57,4 +61,35 @@ void ShaderProgram::use() const {
 
 uint32_t ShaderProgram::get_id() const {
 	return this->id;
+}
+
+int ShaderProgram::get_uniform_location(const std::string& name) {
+	if (uniform_locations.contains(name)) {
+		return uniform_locations.at(name);
+	}
+
+	const int location = glGetUniformLocation(id, name.c_str());
+	if (location == -1) {
+		std::cerr << "Failed to get uniform location with name: " << name << std::endl;
+		return location;
+	}
+
+	uniform_locations.emplace(name, location);
+	return location;
+}
+
+void ShaderProgram::set_matrix4x4(const std::string& name, const glm::mat4x4& matrix) {
+	glUniformMatrix4fv(this->get_uniform_location(name), 1, GL_FALSE, &matrix[0][0]);
+}
+
+void ShaderProgram::set_float(const std::string& name, const float value) {
+	glUniform1f(this->get_uniform_location(name), value);
+}
+
+void ShaderProgram::set_int(const std::string& name, const int value) {
+	glUniform1i(this->get_uniform_location(name), value);
+}
+
+void ShaderProgram::set_vec4(const std::string& name, const glm::vec4& vec) {
+	glUniform4fv(this->get_uniform_location(name), 1, glm::value_ptr(vec));
 }

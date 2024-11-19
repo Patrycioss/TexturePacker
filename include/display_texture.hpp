@@ -24,6 +24,8 @@ class DisplayTexture {
 		glm::ivec2 size;
 		float rotation{0};
 
+		glm::vec4 debug_color{};
+
 	public:
 		explicit DisplayTexture(const Image& image);
 		DisplayTexture(DisplayTexture&& other) noexcept;
@@ -45,5 +47,6 @@ class DisplayTexture {
 		const float& get_rotation() const;
 
 		const glm::ivec2& get_original_size() const;
+		const glm::vec4& get_debug_color() const;
 	private:
 };

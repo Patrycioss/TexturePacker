@@ -13,7 +13,6 @@ class Shader {
 	private:
 		uint32_t id{};
 		Type type;
-		std::string name;
 
 	public:
 		explicit Shader(Type type);
