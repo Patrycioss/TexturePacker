@@ -16,7 +16,7 @@ bool Shader::load(const std::string& path) {
 	if (read_file_to_string(path, &source)) {
 		const char* src_str = source.c_str();
 
-		std::cout << "Loaded shader with name: \n" << src_str << std::endl;
+		// std::cout << "Loaded shader with name: \n" << src_str << std::endl;
 
 		glShaderSource(this->id, 1, &src_str, nullptr);
 		glCompileShader(this->id);

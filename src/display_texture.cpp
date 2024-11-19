@@ -25,8 +25,6 @@ DisplayTexture::DisplayTexture(const Image& image)
 	float r = distribution(gen) / 100.0f;
 	float g = distribution(gen) / 100.0f;
 	float b = distribution(gen) / 100.0f;
-	std::cout << r << " " << g << " " << b << std::endl;
-
 	debug_color = {r, g, b, 1};
 
 	recalculate_model();

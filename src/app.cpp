@@ -33,7 +33,6 @@ void App::start() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Input::initialize(&window);
 
 	if (!this->renderer.initialize()) {
 		throw std::runtime_error("Failed to initialize Renderer!");

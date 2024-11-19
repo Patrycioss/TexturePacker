@@ -1,5 +1,6 @@
 ﻿#include "window.hpp"
 
+#include <Input.hpp>
 #include <glad/glad.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -58,6 +59,8 @@ bool Window::setup(const GLFWkeyfun& key_callback) {
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
 	glfwSetKeyCallback(this->handle, key_callback);
+
+	Input::initialize(this);
 
 	// Setup Dear ImGui context
 	ImGui::CreateContext();
